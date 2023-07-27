@@ -1,0 +1,88 @@
+#include <bits/stdc++.h>
+using namespace std;
+#define int long long int
+#define vi vector<int>
+#define pb push_back
+#define ff first
+#define ss second
+#define pi pair<int, int>
+#define pii vector<pi>
+#define lcm(a, b) a * b / (__gcd(a, b))
+#define mp unordered_map<int, int>
+#define REP(i, a, b) for (int i = a; i < b; i++)
+#define SQ(a) (a) * (a)
+#define MP make_pair
+const int mod = 1e9 + 7;
+/**********************************************************************************************************************************************************************************************************************
+ if i will have a recurrance relation like
+ fn = a*fn-1 + b*fn-2
+then i can write it as a matrix exponention form
+[f1, f2]*[[a b][c, d]]^n = [fn, fn+1]
+ f1*a + f2*b = fn;
+ f1*c+ f2*d = fn+1
+from both the equation i can calculate transition cofficinet
+then using matrix  exponentiation i can calculate effective transtition martrix
+**********************************************************************************************************************************************************************************************************************/
+int arr[3], tr[3][3], I[3][3];
+void multiply(int a[][3], int b[][3]) {
+    int res[3][3];
+    for (int i = 1; i <= 2; i++) {
+        for (int j = 1; j <= 2; j++) {
+             res[i][j] = 0;
+            for (int k = 1; k <= 2; k++) {
+                res[i][j] += (a[i][k] * b[k][j]) % mod;
+                res[i][j] %= mod;
+            }
+        }
+    }
+    for (int i = 1; i <= 2; i++) {
+        for (int j = 1; j <= 2; j++) {
+            a[i][j] = res[i][j];
+        }
+    }
+}
+void expon(int a[][3], int b[][3], int n) {
+    if (n == 0) {
+        a[1][1] = 1;
+        a[1][2] = 0;
+        a[2][1] = 0;
+        a[2][2] = 1;
+        return;
+    }
+    while (n) {
+        if (n & 1) {
+            multiply(a, b);
+            n--;
+        } else {
+            multiply(b, b);
+            n/=2;
+        }
+    }
+}
+void solve() {
+    int tc;
+    cin >> tc;
+    while (tc--) {
+        int a, b, n;
+        cin >> a >> b >> n;
+
+        tr[1][1] = 0;
+        tr[1][2] = 1;
+        tr[2][2] = 1;
+        tr[2][1] = 1;
+
+        I[1][1] = 1;
+        I[1][2] = 0;
+        I[2][2] = 1;
+        I[2][1] = 0;
+        expon(I, tr, n);
+        int ans = ((a * I[1][1]) % mod + (b * I[2][1]) % mod) % mod;
+        cout << ans << endl;
+    }
+}
+signed main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    solve();
+    return 0;
+}
